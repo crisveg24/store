@@ -1,46 +1,31 @@
 Carpeta Load – Carga de Datos
 
-La carpeta Load es responsable de la carga de los datos limpios en el destino adecuado, ya sea un archivo CSV o una base de datos SQLite. Utilizando la clase Loader, se facilita la transferencia de datos desde el formato intermedio (DataFrame) a un almacenamiento persistente.
+La carpeta Load es responsable de la carga de los datos limpios en el destino adecuado, ya sea un archivo CSV o una base de datos SQLite. Esta carpeta contiene la clase Loader, que facilita la transferencia de los datos desde un DataFrame de pandas a un almacenamiento persistente.
 
-Archivo loader.py
+Propósito de la Clase Loader
 
-Este script contiene la clase Loader, que se encarga de cargar los datos transformados en los pasos anteriores del pipeline ETL. La clase tiene métodos para guardar los datos en un archivo CSV o en una base de datos SQLite.
+La clase Loader se encarga de almacenar los datos transformados y listos para su análisis o uso posterior en un formato persistente. Los dos principales destinos de los datos son:
 
-Métodos principales:
-__init__(self, df)
+Archivo CSV: Una opción simple y accesible para almacenar los datos de forma plana y fácil de compartir.
 
-Descripción: Inicializa la clase Loader con un DataFrame (df) que contiene los datos limpios.
+Base de datos SQLite: Un sistema de almacenamiento más robusto y adecuado para consultas rápidas y manejo de grandes volúmenes de datos.
 
-Parámetros:
+Métodos Principales
 
-df (DataFrame): El DataFrame que contiene los datos a cargar.
+Guardar en CSV:
+La clase proporciona un método para guardar los datos limpios en un archivo CSV, lo que permite la fácil distribución o análisis de los datos en herramientas como Excel o Pandas.
 
-to_csv(self, output_path)
+Guardar en SQLite:
+El otro método de la clase carga los datos en una base de datos SQLite, lo que permite su consulta eficiente y almacenamiento persistente. Este método es útil cuando los datos necesitan ser consultados o actualizados frecuentemente.
 
-Descripción: Guarda el DataFrame limpio en un archivo CSV.
+Buenas Prácticas
 
-Parámetros:
+Persistencia de datos: Guardar los datos procesados en formatos accesibles y persistentes permite que los resultados sean reutilizables y fácilmente compartibles.
 
-output_path (str): Ruta donde se guardará el archivo CSV.
+Modularidad: La clase Loader está diseñada para ser reutilizable y fácil de adaptar a distintos tipos de almacenamiento (CSV, bases de datos) sin necesidad de modificar el flujo principal del proyecto.
 
-Excepciones: Si ocurre un error al guardar los datos en el archivo, se captura la excepción y se imprime un mensaje de error.
-
-to_sqlite(self, db_path=None, table_name=None)
-
-Descripción: Guarda el DataFrame limpio en una base de datos SQLite.
-
-Parámetros:
-
-db_path (str, opcional): Ruta de la base de datos SQLite. Si no se especifica, se utiliza el valor por defecto de la configuración (Config.SQLITE_DB_PATH).
-
-table_name (str, opcional): Nombre de la tabla en la que se almacenarán los datos. Si no se especifica, se utiliza el valor por defecto de la configuración (Config.SQLITE_TABLE).
-
-Excepciones: Si ocurre un error al guardar los datos en la base de datos, se captura la excepción y se imprime un mensaje de error.
-
-Propósito
-
-El objetivo de la clase Loader es guardar los datos limpios en un formato persistente, ya sea como archivo CSV o en una base de datos SQLite. Esto permite que los datos procesados estén disponibles para su análisis posterior o para su integración en otros sistemas.
+Integración con otros sistemas: Al almacenar los datos en un formato común (CSV o SQLite), se facilita la integración con otros sistemas o herramientas de análisis de datos.
 
 Conclusión
 
-La clase Loader es un componente clave en el pipeline ETL, ya que se encarga de la carga de los datos a los destinos finales. Proporciona métodos fáciles de usar para guardar los datos en formatos accesibles y persistentes, lo que permite una fácil integración con otros sistemas o procesos de análisis.
+La clase Loader es crucial para el proceso ETL, ya que asegura que los datos transformados sean almacenados de manera efectiva y accesible. Gracias a su capacidad para guardar datos tanto en archivos CSV como en bases de datos SQLite, permite que los datos sean fácilmente accesibles para su análisis posterior.
