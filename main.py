@@ -1,10 +1,10 @@
-# main.py
 import logging
 import os
 from Config.config import Config
 from Extract.extractor import Extractor
 from Transform.transformer import Transformer
 from Load.loader import Loader
+from Transform.graficas import generar_graficas  # Importamos el módulo de gráficas
 import sqlite3
 
 # Configuración de logging
@@ -18,8 +18,8 @@ def main():
 
     try:
         # Rutas de entrada y salida
-        input_path = "/workspaces/store/Extract/Files/Stores_clean.csv"
-        output_path = "/workspaces/store/Extract/Files/Store_final.csv"
+        input_path = Config.INPUT_PATH
+        output_path = "/workspaces/store/Extract/Files/fifa_eda_stats_final.csv"  # Ruta de salida para el archivo CSV final
 
         # 0️⃣ Crear carpeta de la base de datos si no existe
         db_folder = os.path.dirname(Config.SQLITE_DB_PATH)
@@ -30,7 +30,6 @@ def main():
         conn = sqlite3.connect(Config.SQLITE_DB_PATH)
         cursor = conn.cursor()
         # Crear tabla dinámica según columnas del DataFrame
-        # Si quieres usar columnas fijas, puedes escribirlas aquí; pero el Loader dinámico lo hará automáticamente
         conn.commit()
         conn.close()
         logging.info(f"Archivo SQLite preparado: {Config.SQLITE_DB_PATH}")
@@ -56,6 +55,11 @@ def main():
         loader.to_csv(output_path)
         loader.to_sqlite()  # Guarda en SQLite dinámicamente según columnas del DataFrame
         logging.info(f"Datos guardados en {output_path} y en SQLite: {Config.SQLITE_DB_PATH}")
+
+        # 5️⃣ GENERAR GRÁFICAS
+        logging.info("Generando gráficas...")
+        generar_graficas(df_clean)  # Llamamos a la función para generar las gráficas
+        logging.info("Gráficas generadas correctamente.")
 
     except Exception as e:
         logging.error(f"Error en el proceso ETL: {e}")
