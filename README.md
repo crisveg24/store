@@ -1,77 +1,127 @@
-Proyecto ETL - Gestión de Jugadores de Fútbol
+# Pipeline ETL FIFA con PySpark
 
-Este proyecto es un pipeline ETL (Extract, Transform, Load) diseñado para procesar, limpiar y almacenar los datos de jugadores de fútbol. Utiliza Python y Pandas para el procesamiento de datos, y SQLite como base de datos de destino. El proyecto sigue un enfoque modular, organizando las responsabilidades en diferentes capas, facilitando así su escalabilidad y mantenimiento.
+Este proyecto implementa un pipeline ETL (Extract, Transform, Load) distribuido para procesar datos de jugadores de FIFA utilizando PySpark. El sistema está diseñado para manejar grandes volúmenes de datos de manera eficiente, aprovechando las capacidades de procesamiento distribuido de Apache Spark.
 
-Descripción General
+## Características Principales
 
-El objetivo del proyecto ETL es tomar los datos crudos de un archivo CSV (inicialmente fifa_eda_stats.csv), limpiarlos, transformarlos y cargarlos en una base de datos SQLite. El pipeline está compuesto por tres pasos principales: Extracción, Transformación y Carga.
+- Procesamiento distribuido con PySpark
+- Análisis de datos de jugadores FIFA
+- Visualizaciones estadísticas avanzadas
+- Almacenamiento en SQLite y CSV
+- Pipeline ETL modular y escalable
 
-Extracción: Los datos se extraen de un archivo CSV que contiene información sobre jugadores de fútbol.
+## Arquitectura
 
-Transformación: Los datos extraídos se limpian, se normalizan y se preparan para su almacenamiento, eliminando duplicados, valores nulos y realizando conversiones de tipo de datos.
+El proyecto sigue una arquitectura modular dividida en tres componentes principales:
 
-Carga: Los datos transformados se almacenan en una base de datos SQLite y se generan archivos de salida como gráficas en formato PNG.
+### 1. Extracción (Extract)
+- Lectura de datos CSV usando PySpark DataFrames
+- Validación inicial de datos
+- Manejo de formatos y codificación
 
-Características principales
+### 2. Transformación (Transform)
+- Limpieza de datos usando operaciones de PySpark
+- Normalización de valores monetarios y numéricos
+- Análisis por continente y nacionalidad
+- Generación de visualizaciones estadísticas
 
-Extracción de datos desde un archivo CSV (fifa_eda_stats.csv).
+### 3. Carga (Load)
+- Almacenamiento en SQLite
+- Exportación a CSV
+- Generación de reportes gráficos
 
-Limpieza y transformación de datos utilizando Pandas.
-
-Carga de los datos transformados en una base de datos SQLite.
-
-Generación de gráficas para visualizar patrones y relaciones entre los datos de los jugadores.
-
-Código modular y organizado en carpetas para cada paso del pipeline ETL.
-
-Estructura del Proyecto
-ETL/
+## Estructura del Proyecto
+```
+store/
+├── Config/
+│   └── config.py              # Configuraciones globales
 ├── Extract/
-│   ├── Files/
-│   │   ├── fifa_eda_stats.csv        # Archivo de entrada con los datos crudos de los jugadores
-│   │   └── fifa_eda_stats_clean.csv  # Archivo de salida con los datos limpios
-│   ├── clean.py                      # Script para limpiar y normalizar los datos del CSV
-│   └── extractor.py                  # Clase para extraer datos del CSV
+│   ├── Files/                 # Archivos de datos
+│   └── extractor.py          # Lógica de extracción con PySpark
 ├── Transform/
-│   ├── transformer.py                # Clase para transformar los datos extraídos
-│   └── graficas.py                   # Generación de gráficas para visualización de datos
+│   ├── transformer.py        # Transformaciones usando PySpark
+│   └── graficas_new.py      # Generación de visualizaciones
 ├── Load/
-│   ├── loader.py                     # Clase para cargar los datos en SQLite
-│   └── etl_config.py                 # Configuraciones para el pipeline ETL
-└── requirements.txt                  # Dependencias necesarias para ejecutar el proyecto
+│   └── loader.py            # Carga de datos optimizada
+└── main_pyspark_new.py      # Script principal de orquestación
 
-Dependencias
+## Requisitos
 
-Este proyecto requiere las siguientes librerías para funcionar correctamente:
+- Python 3.6+
+- Java 8+ (requerido para Spark)
+- PySpark 3.5.0+
+- findspark 2.0.1+
+- pandas
+- seaborn
+- matplotlib
+- SQLite3
 
-pandas: Para el procesamiento y análisis de datos.
+## Instalación
 
-sqlite3: Para interactuar con la base de datos SQLite.
+1. Asegúrate de tener Java instalado:
+```bash
+java -version
+```
 
-seaborn: Para generar gráficas y visualizaciones de los datos.
+2. Instala las dependencias:
+```bash
+pip install -r Requirements
+```
 
-matplotlib: Para la creación de gráficos con seaborn.
+## Configuración
 
-Instalación de dependencias
+El proyecto requiere algunas configuraciones iniciales:
 
-Para instalar las dependencias necesarias, ejecuta el siguiente comando:
+1. Estructura de directorios:
+```bash
+mkdir -p Extract/Files
+```
 
-pip install -r requirements.txt
+2. Archivos de datos:
+- Coloca el archivo `fifa_eda_stats_clean.csv` en `Extract/Files/`
 
-Explicación de los cambios realizados:
+## Uso
 
-Enfoque en jugadores de fútbol: El README ahora refleja que estamos trabajando con datos de jugadores de fútbol en lugar de tiendas.
+Para ejecutar el pipeline completo:
 
-Estructura del pipeline ETL: Detallamos cómo se organiza el proyecto en pasos modulares (Extracción, Transformación y Carga), haciendo énfasis en las funcionalidades específicas para los datos de los jugadores.
+```bash
+python main_pyspark_new.py
+```
 
-Gráficas: Se mencionó graficas.py en la sección de Transform, ya que genera visualizaciones de los datos después de la transformación.
+## Visualizaciones Generadas
 
-Dependencias: Añadimos seaborn y matplotlib a las dependencias, ya que son necesarias para generar las gráficas.
+El pipeline genera tres tipos de visualizaciones:
 
-Contribuciones
+1. **Valor vs Overall**: Relación entre el valor del jugador y su puntuación general
+2. **Valor Promedio por Continente**: Análisis del valor de jugadores por región
+3. **Distribución del Valor**: Distribución estadística de valores por continente
 
-Si deseas contribuir al proyecto, por favor sigue las buenas prácticas de documentación y arquitectura ya establecidas. ¡Cualquier mejora o sugerencia será bienvenida!
+## Rendimiento
 
-Licencia
+El sistema está optimizado para procesamiento distribuido con las siguientes configuraciones:
 
-Este proyecto es de uso libre para fines educativos y de aprendizaje.
+- Memoria del driver: 2GB
+- Memoria del executor: 2GB
+- Arrow habilitado para optimización pandas-spark
+- Timezone UTC para consistencia temporal
+
+## Manejo de Errores
+
+El sistema incluye:
+- Logging detallado
+- Manejo de excepciones robusto
+- Limpieza automática de recursos
+- Validación de datos en cada etapa
+
+## Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, asegúrate de:
+
+1. Mantener la estructura modular
+2. Documentar el código nuevo
+3. Seguir las convenciones de PEP 8
+4. Incluir pruebas cuando sea posible
+
+## Autor
+
+Cristian Vega

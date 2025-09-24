@@ -1,56 +1,58 @@
-import pandas as pd
+from pyspark.sql.functions import col, when, regexp_replace, lit
+from pyspark.sql.types import DoubleType
 
 class Transformer:
     """
-    Clase para transformar y limpiar los datos extraídos de fifa_eda_stats_clean.csv.
+    Clase para transformar y limpiar los datos extraídos usando PySpark.
     """
     def __init__(self, df):
         self.df = df
 
     def transform(self):
         """
-        Realiza limpieza y transformación de los datos.
+        Realiza limpieza y transformación de los datos usando PySpark.
         """
-        df = self.df.copy()
-
         # Verificar si las columnas esenciales existen
         required_columns = ['id', 'name', 'age', 'nationality', 'overall', 'potential', 'value', 'wage', 'height', 'weight']
-        for col in required_columns:
-            if col not in df.columns:
-                raise ValueError(f"La columna '{col}' no existe en el DataFrame")
+        for col_name in required_columns:
+            if col_name not in self.df.columns:
+                raise ValueError(f"La columna '{col_name}' no existe en el DataFrame")
 
-        # Convertir las columnas numéricas necesarias a tipo numérico
-        num_cols = ['age', 'overall', 'potential', 'value', 'wage', 'height', 'weight']
-        for col in num_cols:
-            df[col] = pd.to_numeric(df[col], errors='coerce')  # Convierte a numérico, convirtiendo errores a NaN
+        # Convertir columnas monetarias
+        df = self.df
+        df = self.convert_monetary_column(df, 'value')
+        df = self.convert_monetary_column(df, 'wage')
+        df = self.convert_monetary_column(df, 'release_clause')
 
-        # Limpiar valores en 'value', 'wage' y 'release_clause' (convertir de texto a valores numéricos)
-        df['value'] = df['value'].apply(self.convert_to_numeric)
-        df['wage'] = df['wage'].apply(self.convert_to_numeric)
-        df['release_clause'] = df['release_clause'].apply(self.convert_to_numeric)
+        # Convertir columnas numéricas y rellenar nulos con 0
+        num_cols = ['age', 'overall', 'potential', 'height', 'weight']
+        for column in num_cols:
+            df = df.withColumn(column, 
+                             when(col(column).isNull(), lit(0))
+                             .otherwise(col(column).cast(DoubleType())))
 
-        # Rellenar valores nulos en columnas numéricas con 0
-        df[num_cols] = df[num_cols].fillna(0)
+        # Eliminar duplicados por nombre
+        df = df.dropDuplicates(['name'])
 
-        # Si la columna 'name' tiene valores duplicados, los eliminamos
-        df = df.drop_duplicates(subset=['name'])
-
-        # Asignar el DataFrame transformado a self.df
         self.df = df
         return self.df
 
-    def convert_to_numeric(self, value):
+    def convert_monetary_column(self, df, column_name):
         """
-        Convierte valores de texto (como €100M, €1K) a valores numéricos.
+        Convierte valores monetarios (€100M, €1K) a valores numéricos usando PySpark.
         """
-        if isinstance(value, str):
-            value = value.replace('€', '').replace('M', '').replace('K', '').replace(',', '').strip()
-            if 'M' in value:
-                return float(value.replace('M', '')) * 1_000_000
-            elif 'K' in value:
-                return float(value.replace('K', '')) * 1_000
-            try:
-                return float(value)
-            except ValueError:
-                return None
-        return value
+        if column_name not in df.columns:
+            return df
+
+        # Eliminar el símbolo €, la M y la K, y las comas
+        df = df.withColumn(column_name, regexp_replace(col(column_name), '[€,]', ''))
+        
+        # Convertir valores con M (millones)
+        df = df.withColumn(column_name,
+            when(col(column_name).contains('M'),
+                regexp_replace(col(column_name), 'M', '').cast(DoubleType()) * 1000000)
+            .when(col(column_name).contains('K'),
+                regexp_replace(col(column_name), 'K', '').cast(DoubleType()) * 1000)
+            .otherwise(col(column_name).cast(DoubleType())))
+
+        return df

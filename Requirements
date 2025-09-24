@@ -1,4 +1,17 @@
-requests
-pandas
-numpy
-seaborn
+# Procesamiento distribuido
+pyspark==3.5.0      # Framework de procesamiento distribuido
+findspark==2.0.1    # Herramienta para inicializar PySpark
+
+# Visualización de datos
+matplotlib==3.9.2    # Biblioteca base para gráficos
+seaborn==0.13.2     # Visualizaciones estadísticas avanzadas
+
+# Análisis de datos
+pandas              # Requerido por PySpark para conversiones
+numpy               # Dependencia para cálculos numéricos
+
+# Base de datos
+sqlite3             # Incluido en Python estándar
+
+# Nota: Asegúrate de tener Java 8+ instalado en el sistema
+# java -version    # Debe mostrar versión 1.8 o superior
